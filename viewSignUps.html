@@ -1,1 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Sign Up List</title>
+	<link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="Sauron is Watching.png">
+</head>
+<body>
+<div class="container">
+	<div class="top">
+		<h1>PSHS Club Sign Ups</h1>
+		<div>
+			<a href="Form.html"><button type="button">Back to Form</button></a>
+		</div>
+	</div>
+
+	<div class="controls">
+		<label for="clubFilter">Filter by Club: </label>
+		<select id="clubFilter">
+			<option value="all">All Clubs</option>
+			<option value="C1">Computron</option>
+			<option value="C2">Acts</option>
+			<option value="C3">Sapienara</option>
+			<option value="C4">Invictus</option>
+			<option value="C5">Alianti</option>
+		</select>
+		<button id="clearBtn">Clear All Sign Ups</button>
+	</div>
+
+	<h2>Sign Ups</h2>
+	<div id="no-data" style="display:none">No sign ups found.</div>
+	<table id="signupsTable" style="display:none">
+		<thead>
+			<tr>
+				<th>Club</th>
+				<th>ID</th>
+				<th>Full Name</th>
+				<th>Grade</th>
+				<th>Email</th>
+				<th>Number</th>
+				<th>Intern/Extern</th>
+			</tr>
+		</thead>
+		<tbody></tbody>
+	</table>
+
+</div>
+
+<script>
+(function(){
+	const CLUB_NAMES = {
+		'C1': 'Computron',
+		'C2': 'Acts',
+		'C3': 'Sapienara',
+		'C4': 'Invictus',
+		'C5': 'Alianti'
+	};
+
+	function loadSignups() {
+		const raw = localStorage.getItem('clubApplications');
+		if (!raw) return [];
+		try { return JSON.parse(raw); } catch(e){ return []; }
+	}
+
+	function renderTable(data) {
+		const table = document.getElementById('signupsTable');
+		const tbody = table.querySelector('tbody');
+		tbody.innerHTML = '';
+		data.forEach(entry => {
+			const tr = document.createElement('tr');
+			const club = CLUB_NAMES[entry.chooseClub] || entry.chooseClub || '';
+			const id = entry.studentId || '';
+			const fullName = entry.fullName || '';
+			const grade = entry.gradeLevel || '';
+			const email = entry.schoolEmail || '';
+			const number = entry.mobileNumber || '';
+			const intern = entry.internExtern || '';
+			tr.innerHTML = `<td>${club}</td><td>${id}</td><td>${fullName}</td><td>${grade}</td><td>${email}</td><td>${number}</td><td>${intern}</td>`;
+			tbody.appendChild(tr);
+		});
+		table.style.display = data.length ? '' : 'none';
+		document.getElementById('no-data').style.display = data.length ? 'none' : '';
+	}
+
+    
+
+	function refresh() {
+		const allData = loadSignups();
+		const filter = document.getElementById('clubFilter') ? document.getElementById('clubFilter').value : 'all';
+		const filtered = filter === 'all' ? allData : allData.filter(e => e.chooseClub === filter);
+		renderTable(filtered);
+	}
+
+	document.getElementById('clearBtn').addEventListener('click', function(){
+		if (confirm('Clear all stored sign ups?')) {
+			localStorage.removeItem('clubApplications');
+			refresh();
+		}
+	});
+
+	const clubFilterEl = document.getElementById('clubFilter');
+	if (clubFilterEl) {
+		clubFilterEl.addEventListener('change', refresh);
+	}
+
+	refresh();
+})();
+</script>
+</body>
+</html>
 

@@ -1,1 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="formLogo.png">
+    <title>Club Application</title>
+</head>
+<body>
 
+<div class="container">
+    <div style="text-align: right; margin-bottom: 8px;">
+        <a href="viewSignUps.html"><button type="button">View Sign Ups</button></a>
+    </div>
+    <h1> PSHS Club Registration </h1>
+
+    <form method="post" action="submit" onsubmit="return confirmSubmit()" onreset="return confirmReset()">
+
+        <fieldset>
+            <legend>Student Identification</legend>
+            
+            <label>
+                Student ID:
+                <input type="text" name="studentId" required onblur="checkEmpty(this)">
+            </label>
+            
+            <label>
+                Full Name:
+                <input type="text" name="fullName" required onblur="checkEmpty(this)">
+            </label>
+
+            <label>
+                Birth Date:
+                <input type="date" name="birthDate" required>
+            </label>
+
+            <label>
+                School email:
+                <input type="email" name="schoolEmail" required>
+            </label>
+
+            <label>
+                Mobile Number:
+                <input type="text" name="mobileNumber" required onblur="checkEmpty(this)">
+            </label>
+
+            <label>
+                Grade Level
+                <select name="gradeLevel" required>
+                    <option value="">-- Choose Grade --</option>
+                    <option value="G7">Grade 7</option>
+                    <option value="G8">Grade 8</option>
+                    <option value="G9">Grade 9</option>
+                    <option value="G10">Grade 10</option>
+                    <option value="G11">Grade 11</option>
+                    <option value="G12">Grade 12</option>
+                </select>
+            </label>
+            
+            <label>Intern/Extern:</label>
+            <label>
+                <input type="radio" name="internExtern" value="Intern" required> Intern
+            </label>
+            <label>
+                <input type="radio" name="internExtern" value="Extern"> Extern
+            </label>
+
+        </fieldset>
+
+        <fieldset>
+            <legend>Preferred Club</legend> 
+
+            <label>
+                Choose Club:
+                <select name="chooseClub" required>
+                    <option value="">-- Available Clubs --</option>
+                    <option value="C1">Computron</option>
+                    <option value="C2">Acts</option>
+                    <option value="C3">Sapienara</option>
+                    <option value="C4">Invictus</option>
+                    <option value="C5">Alianti</option>
+                </select>
+            </label>
+
+            <label>
+                Why do you want to join this club?
+                <textarea name="reason" rows="5" required onblur="checkEmpty(this)"></textarea>
+            </label>
+        </fieldset>
+
+        <div class="buttons">
+            <button type="submit">Apply For Club</button>
+            <button type="reset"> Clear Form</button>
+        </div>
+
+    </form>
+</div>
+
+<script>
+function confirmSubmit() {
+    saveLS();
+    if (confirm("Will you sell your soul?")) {
+        alert("Your vow has been etched into your very being... Form submitted!");
+        const form = document.querySelector('form');
+        const prevOnreset = form.onreset;
+        try {
+            form.onreset = null;
+            form.reset();
+        } finally {
+            form.onreset = prevOnreset;
+        }
+        return false;
+    }
+    return false;
+}
+
+function confirmReset() {
+    return confirm("Would you purge all that you have slaved away for?");
+}
+
+function checkEmpty(el) {
+    if (el.value.trim() === "") {
+        el.classList.add("error");
+    } else {
+        el.classList.remove("error");
+    }
+}
+
+function saveLS() {
+    const form = document.querySelector('form');
+    const inputs = form.querySelectorAll('input, select, textarea');
+    const formData = {};
+
+    inputs.forEach(input => {
+        if (input.type === 'radio') {
+            if (input.checked) {
+                formData[input.name] = input.value;
+            }
+        } else {
+            formData[input.name || input.id] = input.value;
+        }
+    });
+
+    const key = 'clubApplications';
+    const existing = JSON.parse(localStorage.getItem(key) || '[]');
+    existing.push(formData);
+    localStorage.setItem(key, JSON.stringify(existing));
+
+    localStorage.setItem('clubApplicationData', JSON.stringify(formData));
+    console.log('Form data saved to local storage (appended):', formData);
+}
+
+function loadLS() {
+    const savedData = localStorage.getItem('clubApplicationData');
+    if (savedData) {
+        const formData = JSON.parse(savedData);
+        const form = document.querySelector('form');
+        const inputs = form.querySelectorAll('input, select, textarea');
+
+        inputs.forEach(input => {
+            if (input.type === 'radio') {
+                if (formData[input.name] === input.value) {
+                    input.checked = true;
+                }
+            } else {
+                input.value = formData[input.name || input.id] || '';
+            }
+        });
+
+        console.log('Form data loaded from local storage:', formData);
+    }
+}
+
+window.addEventListener('load', loadLS);
+</script>
+
+</body>
+</html>
